@@ -4,6 +4,13 @@ from django.db import models
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True)
+    cover_image = models.ImageField(upload_to="quiz/images/", null=True)
+
+    class Meta:
+        verbose_name_plural = "Quizzes"
+
+    def __str__(self):
+        return f"Quiz(id={self.id}, title={self.title})"
 
 
 class Question(models.Model):

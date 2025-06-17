@@ -29,7 +29,6 @@ class QuestionViewSet(ListModelMixin, GenericViewSet):
             Question.objects.prefetch_related(
                 Prefetch("options", queryset=Option.objects.order_by("?"))
             )
-            # Question.objects.prefetch_related("options")
             .filter(quiz_id=self.kwargs["quiz_pk"])
             .order_by("?")
         )[: self.default_question_count]
