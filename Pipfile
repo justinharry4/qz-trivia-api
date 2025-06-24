@@ -7,12 +7,13 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 mysqlclient = "*"
-django-debug-toolbar = "*"
 drf-nested-routers = "*"
 requests = "*"
 pillow = "*"
+django-cors-headers = "*"
 
 [dev-packages]
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.10"
