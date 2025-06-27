@@ -1,10 +1,14 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True)
     cover_image = models.ImageField(upload_to="quiz/images/", null=True)
+    questions_per_attempt = models.PositiveSmallIntegerField(
+        default=15, validators=[MinValueValidator(1), MaxValueValidator(150)]
+    )
 
     class Meta:
         verbose_name_plural = "Quizzes"

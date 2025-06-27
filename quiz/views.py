@@ -22,13 +22,14 @@ class QuizViewSet(
 
 class QuestionViewSet(ListModelMixin, GenericViewSet):
     serializer_class = QuestionSerializer
-    default_question_count = 15
 
     def get_queryset(self):
+        quiz = Quiz.objects.get(pk=self.kwargs['quiz_pk'])
+
         return (
             Question.objects.prefetch_related(
                 Prefetch("options", queryset=Option.objects.order_by("?"))
             )
-            .filter(quiz_id=self.kwargs["quiz_pk"])
+            .filter(quiz_id=quiz.id)
             .order_by("?")
-        )[: self.default_question_count]
+        )[: quiz.questions_per_attempt]
