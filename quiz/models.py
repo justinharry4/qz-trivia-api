@@ -32,14 +32,23 @@ class Option(models.Model):
 
 class Result(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    duration = models.DurationField()
+    duration = models.DurationField(null=True)
 
 
 class AnsweredQuestion(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Option, null=True, on_delete=models.CASCADE)
+    position_in_quiz = models.PositiveSmallIntegerField()
     result = models.ForeignKey(
         Result,
         on_delete=models.CASCADE,
         related_name="answered_questions",
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['result_id', 'position_in_quiz'],
+                name="unique_position_in_quiz"
+            )
+        ]
