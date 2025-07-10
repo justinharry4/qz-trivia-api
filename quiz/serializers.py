@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.utils.functional import cached_property
 
 from rest_framework import serializers
 
@@ -133,24 +134,49 @@ class AnsweredQuestionSerializer(serializers.ModelSerializer):
 class ResultSerializer(serializers.ModelSerializer):
     quiz = SimpleQuizSerializer()
     answered_questions = AnsweredQuestionSerializer(many=True)
+    total_answered = serializers.SerializerMethodField()
+    total_correct = serializers.SerializerMethodField()
     percentage_score = serializers.SerializerMethodField()
 
     class Meta:
         model = Result
-        fields = ["id", "quiz", "answered_questions", "percentage_score"]
+        fields = [
+            "id",
+            "quiz",
+            "answered_questions",
+            "total_answered",
+            "total_correct",
+            "percentage_score",
+        ]
 
-    def get_percentage_score(self, obj):
-        queryset = obj.answered_questions.all()
+    @cached_property
+    def _answered_questions(self):
+        queryset = self.instance.answered_questions.all()
         serializer = AnsweredQuestionSerializer(queryset, many=True)
-        answered_questions = serializer.data
+        return serializer.data
 
-        total_question_count = len(answered_questions)
-        correct_question_count = 0
-
-        for aq in answered_questions:
+    @cached_property
+    def _total_correct(self):
+        total_correct = 0
+        for aq in self._answered_questions:
             selected_option = aq.get('selected_option', None) 
             if selected_option and aq['correct_option']['id'] == selected_option['id']:
-                correct_question_count += 1
+                total_correct += 1
 
-        return round((correct_question_count / total_question_count) * 100)
+        return total_correct
+
+    def get_total_answered(self, obj):
+        return len(self._answered_questions)
+
+    def get_total_correct(self, obj):
+        return self._total_correct
+
+    def get_percentage_score(self, obj):
+        total_answered = len(self._answered_questions)
+        total_correct = self._total_correct
+
+        return (
+            round((total_correct / total_answered) * 100, 1)
+            if total_answered else 0
+        )
 

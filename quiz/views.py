@@ -1,8 +1,6 @@
 from django.db.models import Prefetch
-from django.http import Http404
 
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, DestroyModelMixin, CreateModelMixin
 from rest_framework.permissions import IsAdminUser, AllowAny
@@ -41,23 +39,25 @@ class QuestionViewSet(ListModelMixin, GenericViewSet):
 
 
 class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
-    ordered_questions_prefetch = Prefetch(
-        'answered_questions',
-        queryset=AnsweredQuestion.objects.order_by('position_in_quiz')
-    )
-    correct_options_prefetch = Prefetch(
-        'answered_questions__question__options',
-        queryset=Option.objects.filter(is_correct=True)
-    )
-    queryset = (
-        Result.objects
-            .select_related('quiz')
-            .prefetch_related(
-                ordered_questions_prefetch,
-                'answered_questions__selected_option',
-                correct_options_prefetch
-            )
-    )
+    def get_queryset(self):
+        ordered_questions_prefetch = Prefetch(
+            'answered_questions',
+            queryset=AnsweredQuestion.objects.order_by('position_in_quiz')
+        )
+        correct_options_prefetch = Prefetch(
+            'answered_questions__question__options',
+            queryset=Option.objects.filter(is_correct=True)
+        )
+        return (
+            Result.objects
+                .filter(quiz_id=self.kwargs['quiz_pk'])
+                .select_related('quiz')
+                .prefetch_related(
+                    ordered_questions_prefetch,
+                    'answered_questions__selected_option',
+                    correct_options_prefetch
+                )
+        )
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -96,7 +96,7 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
 
         instance = self.perform_create(create_serializer)
 
-        prefetched_instance = self.queryset.get(pk=instance.id)
+        prefetched_instance = self.get_queryset().get(pk=instance.id)
         return_serializer = ResultSerializer(prefetched_instance)
         return Response(return_serializer.data, status=status.HTTP_201_CREATED)
 
