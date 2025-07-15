@@ -44,9 +44,9 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
             'answered_questions',
             queryset=AnsweredQuestion.objects.order_by('position_in_quiz')
         )
-        correct_options_prefetch = Prefetch(
+        all_options_prefetch = Prefetch(
             'answered_questions__question__options',
-            queryset=Option.objects.filter(is_correct=True)
+            queryset=Option.objects.order_by("?")
         )
         return (
             Result.objects
@@ -55,7 +55,7 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
                 .prefetch_related(
                     ordered_questions_prefetch,
                     'answered_questions__selected_option',
-                    correct_options_prefetch
+                    all_options_prefetch
                 )
         )
 

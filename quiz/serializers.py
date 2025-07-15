@@ -33,12 +33,6 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = ["id", "content", "options"]
 
-class SimpleQuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Question
-        fields = ["id", "content"]
-
-
 
 class SimpleAnsweredQuestionSerializer(serializers.Serializer):
     question_id = serializers.IntegerField()
@@ -110,7 +104,7 @@ class CreateResultSerializer(serializers.Serializer):
 
 
 class AnsweredQuestionSerializer(serializers.ModelSerializer):
-    question = SimpleQuestionSerializer()
+    question = QuestionSerializer()
     selected_option = OptionSerializer()
     question_number = serializers.IntegerField(source="position_in_quiz")
     correct_option = serializers.SerializerMethodField()
@@ -126,7 +120,8 @@ class AnsweredQuestionSerializer(serializers.ModelSerializer):
         ]
 
     def get_correct_option(self, obj):
-        correct_option = obj.question.options.all()[0]
+        options = obj.question.options.all()
+        correct_option = next((opt for opt in options if opt.is_correct))
         serializer = OptionSerializer(correct_option)
         return serializer.data
 
@@ -151,15 +146,16 @@ class ResultSerializer(serializers.ModelSerializer):
 
     @cached_property
     def _answered_questions(self):
-        queryset = self.instance.answered_questions.all()
-        serializer = AnsweredQuestionSerializer(queryset, many=True)
-        return serializer.data
+        return self.instance.answered_questions.all()
 
     @cached_property
     def _total_correct(self):
+        queryset = self._answered_questions
+        serializer = AnsweredQuestionSerializer(queryset, many=True)
         total_correct = 0
-        for aq in self._answered_questions:
-            selected_option = aq.get('selected_option', None) 
+        
+        for aq in serializer.data:
+            selected_option = aq.get('selected_option', None)
             if selected_option and aq['correct_option']['id'] == selected_option['id']:
                 total_correct += 1
 
