@@ -14,8 +14,16 @@ from .serializers import QuizSerializer, QuestionSerializer, CreateResultSeriali
 class QuizViewSet(
     ListModelMixin, RetrieveModelMixin, DestroyModelMixin, GenericViewSet
 ):
-    queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
+
+    def get_queryset(self):
+        queryset = Quiz.objects.all()
+        limit = self.request.query_params.get('limit', None)
+
+        if limit and limit.isdigit() and int(limit) > 0:
+            return queryset[:int(limit)]
+
+        return queryset
 
     def get_permissions(self):
         if self.action == "destroy":
