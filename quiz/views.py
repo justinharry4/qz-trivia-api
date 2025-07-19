@@ -1,4 +1,5 @@
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -35,7 +36,7 @@ class QuestionViewSet(ListModelMixin, GenericViewSet):
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
-        quiz = Quiz.objects.get(pk=self.kwargs['quiz_pk'])
+        quiz = get_object_or_404(Quiz, pk=self.kwargs['quiz_pk'])
 
         return (
             Question.objects.prefetch_related(
