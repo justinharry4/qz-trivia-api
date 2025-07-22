@@ -1,3 +1,6 @@
+import json
+import logging
+
 from django.db import transaction
 from django.utils.functional import cached_property
 
@@ -5,6 +8,8 @@ from rest_framework import serializers
 
 from .models import Option, Question, Quiz, Result, AnsweredQuestion
 
+
+logger = logging.getLogger(__name__)
 
 class QuizSerializer(serializers.ModelSerializer):
     question_count = serializers.IntegerField(source="questions_per_attempt")
@@ -49,6 +54,9 @@ class CreateResultSerializer(serializers.Serializer):
         quiz = self.context['quiz']
 
         if len(answered_questions) == 0:
+            logger.warning(
+                f'Invalid result creation attempted'
+            )
             raise serializers.ValidationError(
                 "This field must be a list of one or more items"
             )
@@ -81,13 +89,18 @@ class CreateResultSerializer(serializers.Serializer):
             errors["question_number"] = "Question numbers must be unique"
 
         if errors:
+            logger.warning(
+                f'Invalid result creation attempted - Error: {json.dumps(errors)}'
+            )
+
             raise serializers.ValidationError(errors)
 
         return answered_questions
 
     def create(self, validated_data):
         with transaction.atomic():
-            result = Result.objects.create(quiz=self.context['quiz'])
+            quiz = self.context['quiz']
+            result = Result.objects.create(quiz=quiz)
 
             answered_questions = [
                 AnsweredQuestion(

@@ -1,6 +1,9 @@
 # QZ Project playground
 playground.py
 
+# QZ project logs
+logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

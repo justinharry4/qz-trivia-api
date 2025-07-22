@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 
@@ -10,6 +12,9 @@ from rest_framework import status
 
 from .models import Question, Quiz, Option, Result, AnsweredQuestion
 from .serializers import QuizSerializer, QuestionSerializer, CreateResultSerializer, ResultSerializer
+
+
+logger = logging.getLogger(__name__)
 
 
 class QuizViewSet(
@@ -31,6 +36,15 @@ class QuizViewSet(
             return [IsAdminUser()]
         return [AllowAny()]
 
+    def list(self, request, *args, **kwargs):
+        logger.info('Quiz list fetched')
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info(f"Quiz retrieved - Quiz ID: {self.kwargs['pk']}")
+
+        return super().retrieve(request, *args, **kwargs)
+
 
 class QuestionViewSet(ListModelMixin, GenericViewSet):
     serializer_class = QuestionSerializer
@@ -45,6 +59,10 @@ class QuestionViewSet(ListModelMixin, GenericViewSet):
             .filter(quiz_id=quiz.id)
             .order_by("?")
         )[: quiz.questions_per_attempt]
+
+    def list(self, request, *args, **kwargs):
+        logger.info(f"Question list fetched - Quiz ID: {self.kwargs['quiz_pk']}")
+        return super().list(request, *args, **kwargs)
 
 
 class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -107,6 +125,20 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
 
         prefetched_instance = self.get_queryset().get(pk=instance.id)
         return_serializer = ResultSerializer(prefetched_instance)
+
+        logger.info(
+            f"Result created - Result ID: {instance.id} - "
+            f"Quiz ID: {instance.quiz.id}"
+        )
+        
         return Response(return_serializer.data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.warning(
+            f"Result retrieved - Result ID: {self.kwargs['pk']} - "
+            f"Quiz ID: {self.kwargs['quiz_pk']}"
+        )
+
+        return super().retrieve(request, *args, **kwargs)
 
 
