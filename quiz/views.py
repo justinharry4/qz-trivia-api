@@ -140,5 +140,3 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
         )
 
         return super().retrieve(request, *args, **kwargs)
-
-
