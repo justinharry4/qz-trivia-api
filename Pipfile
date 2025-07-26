@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
-mysqlclient = "*"
 drf-nested-routers = "*"
 requests = "*"
 pillow = "*"
@@ -20,6 +19,7 @@ whitenoise = "*"
 [dev-packages]
 django-debug-toolbar = "*"
 python-dotenv = "*"
+mysqlclient = "*"
 
 [requires]
 python_version = "3.10"
