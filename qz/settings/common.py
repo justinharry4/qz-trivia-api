@@ -104,17 +104,15 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler'
         },
-        'rotating_file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'qz.log',
-            'maxBytes': 1024 * 1024 * 5,
-            'backupCount': 5,
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'qz.log',
             'formatter': 'verbose',
         }
     },
     'loggers': {
         '': {
-            'handlers': ['console', 'rotating_file'],
+            'handlers': ['console', 'file'],
             'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO'),
         }
     },
