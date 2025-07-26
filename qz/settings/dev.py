@@ -20,18 +20,18 @@ INSTALLED_APPS += ["debug_toolbar"]
 MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
 
 # Local Database
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "qz",
-#         "USER": "root",
-#         "PASSWORD": "MyComplexPassword",
-#         "HOST": "127.0.0.1",
-#     }
-# }
 
-# Remote Database
 DATABASES = {
-    "default": dj_database_url.config()
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "qz",
+        "USER": "root",
+        "PASSWORD": "Svenburg@7",
+        "HOST": "127.0.0.1",
+    }
 }
 
+# Remote Database
+# DATABASES = {
+#     "default": dj_database_url.config()
+# }

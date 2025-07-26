@@ -4,6 +4,9 @@ playground.py
 # QZ project logs
 logs/
 
+# Static files
+staticfiles/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
