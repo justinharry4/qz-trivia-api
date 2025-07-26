@@ -1,11 +1,12 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True)
-    cover_image = models.ImageField(upload_to="quiz/images/", null=True)
+    cover_image = models.ImageField(upload_to="images/", null=True, storage=MediaCloudinaryStorage())
     questions_per_attempt = models.PositiveSmallIntegerField(
         default=15, validators=[MinValueValidator(1), MaxValueValidator(150)]
     )
