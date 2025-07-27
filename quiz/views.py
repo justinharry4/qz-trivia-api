@@ -23,7 +23,7 @@ class QuizViewSet(
     serializer_class = QuizSerializer
 
     def get_queryset(self):
-        queryset = Quiz.objects.all()
+        queryset = Quiz.objects.order_by('id')
         limit = self.request.query_params.get('limit', None)
 
         if limit and limit.isdigit() and int(limit) > 0:

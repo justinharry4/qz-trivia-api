@@ -19,6 +19,7 @@ INSTALLED_APPS += ["debug_toolbar"]
 
 MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
 
+
 # Local Database
 
 DATABASES = {
@@ -31,7 +32,9 @@ DATABASES = {
     }
 }
 
+
 # Remote Database
+
 # DATABASES = {
 #     "default": dj_database_url.config()
 # }
