@@ -5,13 +5,23 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, DestroyModelMixin, CreateModelMixin
 from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.exceptions import NotFound
 from rest_framework import status
+from rest_framework.mixins import (
+    ListModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    CreateModelMixin,
+)
 
 from .models import Question, Quiz, Option, Result, AnsweredQuestion
-from .serializers import QuizSerializer, QuestionSerializer, CreateResultSerializer, ResultSerializer
+from .serializers import (
+    QuizSerializer,
+    QuestionSerializer,
+    CreateResultSerializer,
+    ResultSerializer,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -23,11 +33,11 @@ class QuizViewSet(
     serializer_class = QuizSerializer
 
     def get_queryset(self):
-        queryset = Quiz.objects.order_by('id')
-        limit = self.request.query_params.get('limit', None)
+        queryset = Quiz.objects.order_by("id")
+        limit = self.request.query_params.get("limit", None)
 
         if limit and limit.isdigit() and int(limit) > 0:
-            return queryset[:int(limit)]
+            return queryset[: int(limit)]
 
         return queryset
 
@@ -37,7 +47,7 @@ class QuizViewSet(
         return [AllowAny()]
 
     def list(self, request, *args, **kwargs):
-        logger.info('Quiz list fetched')
+        logger.info("Quiz list fetched")
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
@@ -50,7 +60,7 @@ class QuestionViewSet(ListModelMixin, GenericViewSet):
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
-        quiz = get_object_or_404(Quiz, pk=self.kwargs['quiz_pk'])
+        quiz = get_object_or_404(Quiz, pk=self.kwargs["quiz_pk"])
 
         return (
             Question.objects.prefetch_related(
@@ -68,33 +78,32 @@ class QuestionViewSet(ListModelMixin, GenericViewSet):
 class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
     def get_queryset(self):
         ordered_questions_prefetch = Prefetch(
-            'answered_questions',
-            queryset=AnsweredQuestion.objects.order_by('position_in_quiz')
+            "answered_questions",
+            queryset=AnsweredQuestion.objects.order_by("position_in_quiz"),
         )
         all_options_prefetch = Prefetch(
-            'answered_questions__question__options',
-            queryset=Option.objects.order_by("?")
+            "answered_questions__question__options",
+            queryset=Option.objects.order_by("?"),
         )
         return (
-            Result.objects
-                .filter(quiz_id=self.kwargs['quiz_pk'])
-                .select_related('quiz')
-                .prefetch_related(
-                    ordered_questions_prefetch,
-                    'answered_questions__selected_option',
-                    all_options_prefetch
-                )
+            Result.objects.filter(quiz_id=self.kwargs["quiz_pk"])
+            .select_related("quiz")
+            .prefetch_related(
+                ordered_questions_prefetch,
+                "answered_questions__selected_option",
+                all_options_prefetch,
+            )
         )
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return CreateResultSerializer
 
         return ResultSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        quiz_id = self.kwargs['quiz_pk']
+        quiz_id = self.kwargs["quiz_pk"]
 
         if self.action == "create":
             try:
@@ -102,17 +111,17 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
             except Quiz.DoesNotExist:
                 quiz = None
 
-            context['quiz'] = quiz
+            context["quiz"] = quiz
 
         return context
 
     def perform_create(self, serializer):
-        quiz = serializer.context['quiz']
+        quiz = serializer.context["quiz"]
 
         if not quiz:
             raise NotFound(
                 detail=f"The specified quiz of id `{self.kwargs['quiz_pk']}` "
-                        "does not exist"
+                "does not exist"
             )
 
         return serializer.save()
@@ -130,7 +139,7 @@ class ResultViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
             f"Result created - Result ID: {instance.id} - "
             f"Quiz ID: {instance.quiz.id}"
         )
-        
+
         return Response(return_serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, *args, **kwargs):

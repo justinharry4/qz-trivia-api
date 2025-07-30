@@ -6,7 +6,9 @@ from cloudinary_storage.storage import MediaCloudinaryStorage
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True)
-    cover_image = models.ImageField(upload_to="images/", null=True, storage=MediaCloudinaryStorage())
+    cover_image = models.ImageField(
+        upload_to="images/", null=True, storage=MediaCloudinaryStorage()
+    )
     questions_per_attempt = models.PositiveSmallIntegerField(
         default=15, validators=[MinValueValidator(1), MaxValueValidator(150)]
     )
@@ -49,7 +51,6 @@ class AnsweredQuestion(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['result_id', 'position_in_quiz'],
-                name="unique_position_in_quiz"
+                fields=["result_id", "position_in_quiz"], name="unique_position_in_quiz"
             )
         ]

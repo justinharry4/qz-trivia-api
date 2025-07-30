@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quiz', '0005_alter_result_duration'),
+        ("quiz", "0005_alter_result_duration"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='answeredquestion',
-            name='selected_option',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='quiz.option'),
+            model_name="answeredquestion",
+            name="selected_option",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, to="quiz.option"
+            ),
         ),
     ]

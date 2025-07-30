@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quiz', '0004_quiz_questions_per_attempt'),
+        ("quiz", "0004_quiz_questions_per_attempt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='result',
-            name='duration',
+            model_name="result",
+            name="duration",
             field=models.DurationField(null=True),
         ),
     ]

@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quiz', '0006_alter_answeredquestion_selected_option'),
+        ("quiz", "0006_alter_answeredquestion_selected_option"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='answeredquestion',
-            name='position_in_quiz',
+            model_name="answeredquestion",
+            name="position_in_quiz",
             field=models.PositiveSmallIntegerField(default=None),
             preserve_default=False,
         ),
         migrations.AddConstraint(
-            model_name='answeredquestion',
-            constraint=models.UniqueConstraint(fields=('result_id', 'position_in_quiz'), name='unique_position_in_quiz'),
+            model_name="answeredquestion",
+            constraint=models.UniqueConstraint(
+                fields=("result_id", "position_in_quiz"), name="unique_position_in_quiz"
+            ),
         ),
     ]

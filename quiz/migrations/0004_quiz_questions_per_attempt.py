@@ -7,13 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quiz', '0003_alter_quiz_options'),
+        ("quiz", "0003_alter_quiz_options"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='quiz',
-            name='questions_per_attempt',
-            field=models.PositiveSmallIntegerField(default=15, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(150)]),
+            model_name="quiz",
+            name="questions_per_attempt",
+            field=models.PositiveSmallIntegerField(
+                default=15,
+                validators=[
+                    django.core.validators.MinValueValidator(1),
+                    django.core.validators.MaxValueValidator(150),
+                ],
+            ),
         ),
     ]

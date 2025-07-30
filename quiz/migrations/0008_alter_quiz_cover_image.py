@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quiz', '0007_answeredquestion_position_in_quiz_and_more'),
+        ("quiz", "0007_answeredquestion_position_in_quiz_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='quiz',
-            name='cover_image',
-            field=models.ImageField(null=True, storage=cloudinary_storage.storage.MediaCloudinaryStorage(), upload_to='images/'),
+            model_name="quiz",
+            name="cover_image",
+            field=models.ImageField(
+                null=True,
+                storage=cloudinary_storage.storage.MediaCloudinaryStorage(),
+                upload_to="images/",
+            ),
         ),
     ]

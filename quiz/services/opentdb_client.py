@@ -59,8 +59,8 @@ class OpenTDBClient:
                     elif tdb_response_code == self.TOO_MANY_REQUESTS:
                         if trial == self.RETRIES:
                             logger.warning(
-                                f'OpenTDB request unsuccessful - PATH: {path} - '
-                                f'PARAMS: {params} - reason: Too many requests'
+                                f"OpenTDB request unsuccessful - PATH: {path} - "
+                                f"PARAMS: {params} - reason: Too many requests"
                             )
                             raise APIClientError()
 
@@ -68,25 +68,24 @@ class OpenTDBClient:
                         continue
                     else:
                         logger.error(
-                            f'OpenTDB request unsuccessful - PATH: {path} - '
-                            f'PARAMS: {params} - reason: not specified'
+                            f"OpenTDB request unsuccessful - PATH: {path} - "
+                            f"PARAMS: {params} - reason: not specified"
                         )
                         raise APIClientError()
 
                 return result
             except requests.exceptions.RequestException:
                 logger.error(
-                    f'OpenTDB request failed - PATH: {path} - '
-                    f'PARAMS: {params}',
-                    exc_info=True
+                    f"OpenTDB request failed - PATH: {path} - " f"PARAMS: {params}",
+                    exc_info=True,
                 )
                 raise APIClientError()
 
     def get_categories(self):
-        logger.info('Fetching OpenTDB global category count data')
+        logger.info("Fetching OpenTDB global category count data")
         global_count_result = self.call_endpoint_safely("/api_count_global.php")
 
-        logger.info('Fetching OpenTDB category data')
+        logger.info("Fetching OpenTDB category data")
         category_result = self.call_endpoint_safely("/api_category.php")
 
         categories = category_result["trivia_categories"]
@@ -113,7 +112,7 @@ class OpenTDBClient:
         }
 
         logger.info(
-            f'Fetching OpenTDB question data - OpenTDB Category ID: {category_id}'
+            f"Fetching OpenTDB question data - OpenTDB Category ID: {category_id}"
         )
         result = self.call_endpoint_safely("/api.php", params=params)
 

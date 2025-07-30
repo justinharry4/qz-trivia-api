@@ -11,6 +11,7 @@ from .models import Option, Question, Quiz, Result, AnsweredQuestion
 
 logger = logging.getLogger(__name__)
 
+
 class QuizSerializer(serializers.ModelSerializer):
     question_count = serializers.IntegerField(source="questions_per_attempt")
 
@@ -51,30 +52,26 @@ class CreateResultSerializer(serializers.Serializer):
     def validate_answered_questions(self, answered_questions):
         errors = {}
         question_ids, option_ids, question_numbers = [], [], []
-        quiz = self.context['quiz']
+        quiz = self.context["quiz"]
 
         if len(answered_questions) == 0:
-            logger.warning(
-                f'Invalid result creation attempted'
-            )
+            logger.warning(f"Invalid result creation attempted")
             raise serializers.ValidationError(
                 "This field must be a list of one or more items"
             )
 
         for entry in answered_questions:
-            question_ids.append(entry['question_id'])
-            question_numbers.append(entry['question_number'])
+            question_ids.append(entry["question_id"])
+            question_numbers.append(entry["question_number"])
 
-            if entry['option_id'] != 0:
-                option_ids.append(entry['option_id'])
+            if entry["option_id"] != 0:
+                option_ids.append(entry["option_id"])
 
         if Question.objects.filter(pk__in=question_ids).count() < len(question_ids):
             errors["question_id"] = "One or more invalid question ids were passed"
         elif quiz:
-            all_question_ids = (
-                Question.objects
-                    .filter(quiz=quiz)
-                    .values_list('id', flat=True)
+            all_question_ids = Question.objects.filter(quiz=quiz).values_list(
+                "id", flat=True
             )
 
             if set(question_ids) - set(all_question_ids):
@@ -90,7 +87,7 @@ class CreateResultSerializer(serializers.Serializer):
 
         if errors:
             logger.warning(
-                f'Invalid result creation attempted - Error: {json.dumps(errors)}'
+                f"Invalid result creation attempted - Error: {json.dumps(errors)}"
             )
 
             raise serializers.ValidationError(errors)
@@ -99,7 +96,7 @@ class CreateResultSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         with transaction.atomic():
-            quiz = self.context['quiz']
+            quiz = self.context["quiz"]
             result = Result.objects.create(quiz=quiz)
 
             answered_questions = [
@@ -107,8 +104,9 @@ class CreateResultSerializer(serializers.Serializer):
                     question_id=aq["question_id"],
                     selected_option_id=aq["option_id"] or None,
                     position_in_quiz=aq["question_number"],
-                    result=result
-                ) for aq in validated_data["answered_questions"]
+                    result=result,
+                )
+                for aq in validated_data["answered_questions"]
             ]
 
             AnsweredQuestion.objects.bulk_create(answered_questions)
@@ -129,7 +127,7 @@ class AnsweredQuestionSerializer(serializers.ModelSerializer):
             "question",
             "selected_option",
             "correct_option",
-            "question_number"
+            "question_number",
         ]
 
     def get_correct_option(self, obj):
@@ -166,10 +164,10 @@ class ResultSerializer(serializers.ModelSerializer):
         queryset = self._answered_questions
         serializer = AnsweredQuestionSerializer(queryset, many=True)
         total_correct = 0
-        
+
         for aq in serializer.data:
-            selected_option = aq.get('selected_option', None)
-            if selected_option and aq['correct_option']['id'] == selected_option['id']:
+            selected_option = aq.get("selected_option", None)
+            if selected_option and aq["correct_option"]["id"] == selected_option["id"]:
                 total_correct += 1
 
         return total_correct
@@ -184,8 +182,4 @@ class ResultSerializer(serializers.ModelSerializer):
         total_answered = len(self._answered_questions)
         total_correct = self._total_correct
 
-        return (
-            round((total_correct / total_answered) * 100, 1)
-            if total_answered else 0
-        )
-
+        return round((total_correct / total_answered) * 100, 1) if total_answered else 0
