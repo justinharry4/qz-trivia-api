@@ -19,21 +19,30 @@ INSTALLED_APPS += ["debug_toolbar"]
 
 MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
 
-
-# Local Database
+# Local SQLite Database
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "qz",
-        "USER": "root",
-        "PASSWORD": "Svenburg@7",
-        "HOST": "127.0.0.1",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
 
-# Remote Database
+# Local MySQL Database
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "qz",
+#         "USER": "root",
+#         "PASSWORD": "Svenburg@7",
+#         "HOST": "127.0.0.1",
+#     }
+# }
+
+
+# Remote Postgres Database
 
 # DATABASES = {
 #     "default": dj_database_url.config()
